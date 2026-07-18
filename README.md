@@ -1,6 +1,6 @@
 # linux-tools
 ## Description
-A collection of personal scripts for day-to-day Linux administration
+A collection of personal scripts for day-to-day Linux administration.  
 Git helpers, Sylius/Symfony/PHP inspection, shell utilities, and autostart tweaks.
 
 ## Table of contents
@@ -34,11 +34,17 @@ cd linux-tools
 
 2. Import scripts using the `install.sh` file
 ```bash
-chmod +x install.sh && $_
+chmod +x install.sh && ./install.sh
+```
+
+3. Create aliases (zsh)
+```bash
+echo "alias mkfile='~/.local/share/scripts/mkfile.sh'" >> ~/.zshrc
 ```
 
 ## Usage
 Each script is self-contained and documented with a header comment describing its globals, arguments, and outputs
+After alias creation, you just have to call your alias in cli
 
 ## Help
 If you encounter issues, ensure:
