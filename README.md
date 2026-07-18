@@ -11,6 +11,7 @@ Git helpers, Sylius/Symfony/PHP inspection, shell utilities, and autostart tweak
   - [Technologies used](#technologies-used)
   - [Installation and run](#installation-and-run)
 - [Usage](#usage)
+- [Project structure](#project-structure)
 - [Help](#help)
 - [Author](#author)
 - [License](#license)
@@ -45,6 +46,13 @@ echo "alias mkfile='~/.local/share/scripts/mkfile.sh'" >> ~/.zshrc
 ## Usage
 Each script is self-contained and documented with a header comment describing its globals, arguments, and outputs
 After alias creation, you just have to call your alias in cli
+
+## Project structure
+- scripts/     Alias-worthy commands, installed by install.sh
+- autostart/   Triggered once at session/login startup, not aliased
+- snippets/    Reusable functions/templates, not standalone commands
+
+Only `scripts/**` is picked up by `install.sh`. `autostart/` and `snippets/` are excluded on purpose.
 
 ## Help
 If you encounter issues, ensure:
