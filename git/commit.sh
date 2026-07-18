@@ -9,7 +9,7 @@
 #   Case no ticket
 #     git commit -m "[Type] Message"
 #   Case ticket
-#     git commit -m "[Type] ticket-id - Message"
+#     git commit -m "[Type] #ticket-id Message"
 #######################################
 set -euo pipefail
 
@@ -26,7 +26,7 @@ is_interactive_tty() {
 
 # Arrow-key menu, with fallback to classic numbered `select`
 choose_type() {
-  local options=("Feature" "Fix" "Hotfix" "Refactor" "Doc" "Test" "Style" "Release")
+  local options=("Feature" "Chore" "Fix" "Hotfix" "Refactor" "Doc" "Test" "Style" "Release")
 
   if ! is_interactive_tty; then
     local i reply
@@ -49,22 +49,18 @@ choose_type() {
 
   local selected=0
   local n=${#options[@]}
-  local key rest
- 
+  local key rest i
+
   tput civis >&2 2>/dev/null || true
   trap 'tput cnorm >&2 2>/dev/null || true' RETURN
 
-  # reserve the lines we'll redraw
-  printf '\n%.0s' $(seq 1 "$n") >&2
-
   while true; do
-    printf '\033[%dA' "$n" >&2
+    printf '\r\033[K' >&2
     for i in "${!options[@]}"; do
-      printf '\033[K' >&2
       if [ "$i" -eq "$selected" ]; then
-        printf '\033[7m> %s\033[0m\n' "${options[$i]}" >&2
+        printf '\033[32m%s\033[0m  ' "${options[$i]}" >&2
       else
-        printf '  %s\n' "${options[$i]}" >&2
+        printf '%s  ' "${options[$i]}" >&2
       fi
     done
 
@@ -73,8 +69,8 @@ choose_type() {
       $'\x1b')
         read -rsn2 -t 0.01 rest || true
         case "$rest" in
-          '[A') selected=$(((selected - 1 + n) % n)) ;;
-          '[B') selected=$(((selected + 1) % n)) ;;
+          '[A'|'[D') selected=$(((selected - 1 + n) % n)) ;;
+          '[B'|'[C') selected=$(((selected + 1) % n)) ;;
         esac
         ;;
       "")
@@ -85,12 +81,16 @@ choose_type() {
 
   tput cnorm >&2 2>/dev/null || true
 
-  # clear the reserved menu lines so nothing lingers on screen
-  printf '\033[%dA' "$n" >&2
-  for _ in $(seq 1 "$n"); do
-    printf '\033[K\n' >&2
+  # freeze the full line, keeping only the chosen type highlighted
+  printf '\r\033[K' >&2
+  for i in "${!options[@]}"; do
+    if [ "$i" -eq "$selected" ]; then
+      printf '\033[32m%s\033[0m  ' "${options[$i]}" >&2
+    else
+      printf '%s  ' "${options[$i]}" >&2
+    fi
   done
-  printf '\033[%dA' "$n" >&2
+  printf '\n' >&2
 
   echo "${options[$selected]}"
 }
@@ -115,7 +115,7 @@ read_message_colored() {
   else
     color='\033[31m'
   fi
-  printf '\r\033[K%b(%d)\033[0m %s' "$color" "$len" "$prompt" >&2
+  printf '\r\033[K%b(%3d)\033[0m %s' "$color" "$len" "$prompt" >&2
 
   while IFS= read -rsn1 char; do
     if [[ -z "$char" ]]; then
@@ -153,7 +153,7 @@ main() {
   read -r -p "Ticket id (default: none): " ticket >&2
 
   if [ -n "$ticket" ]; then
-    prefix="[$type] $ticket - "
+    prefix="[$type] #$ticket "
   else
     prefix="[$type] "
   fi
@@ -168,7 +168,7 @@ main() {
   done
 
   if [ -n "$ticket" ]; then
-    full_message="[$type] $ticket - $message"
+    full_message="[$type] #$ticket $message"
   else
     full_message="[$type] $message"
   fi
