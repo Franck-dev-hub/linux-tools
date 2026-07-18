@@ -5,7 +5,7 @@
 # Globals:
 #   None
 # Arguments:
-#   None
+#   File path
 # Outputs:
 #   An empty file with parent folders
 #######################################
