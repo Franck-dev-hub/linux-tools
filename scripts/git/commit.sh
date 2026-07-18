@@ -130,9 +130,12 @@ read_message_colored() {
         '[C') [ "$pos" -lt "${#message}" ] && pos=$((pos + 1)) ;;
         '[H') pos=0 ;;
         '[F') pos=${#message} ;;
+        '[3')
+          read -rsn1 -t 0.01 extra || true
+          [ "$pos" -lt "${#message}" ] && message="${message:0:pos}${message:pos+1}"
+          ;;
         '['[0-9])
-          # longer sequence (Delete/Home/End variants), drain the trailing '~'
-          read -rsn1 extra -t 0.01 || true
+          read -rsn1 -t 0.01 extra || true
           ;;
       esac
     else
