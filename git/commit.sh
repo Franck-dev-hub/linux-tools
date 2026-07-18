@@ -13,11 +13,8 @@
 #######################################
 set -euo pipefail
 
-WARN_LEN=50
+WARN_LEN=60
 MAX_LEN=70
-
-# SETUP
-# Create an alias -> alias gcommit='bash /path/to/gcommit.sh'
 
 # Detects whether we can safely draw an interactive arrow menu.
 is_interactive_tty() {
@@ -95,11 +92,12 @@ choose_type() {
   echo "${options[$selected]}"
 }
 
-# Live-colored message input. Fallback to plain `read` when not on an interactive tty.
+# Live-colored message input, with left/right cursor navigation.
+# Fallback to plain `read` when not on an interactive tty.
 read_message_colored() {
   local prefix_len="${1:-0}"
   local prompt="Enter commit message: "
-  local message="" char rest len color
+  local message="" char rest extra len color pos=0 trailing
 
   if ! is_interactive_tty; then
     read -r -p "$prompt" message >&2
@@ -121,12 +119,25 @@ read_message_colored() {
     if [[ -z "$char" ]]; then
       break
     elif [[ "$char" == $'\x7f' ]]; then
-      [[ -n "$message" ]] && message="${message%?}"
+      if [ "$pos" -gt 0 ]; then
+        message="${message:0:pos-1}${message:pos}"
+        pos=$((pos - 1))
+      fi
     elif [[ "$char" == $'\x1b' ]]; then
       read -rsn2 -t 0.01 rest || true
-      continue
+      case "$rest" in
+        '[D') [ "$pos" -gt 0 ] && pos=$((pos - 1)) ;;
+        '[C') [ "$pos" -lt "${#message}" ] && pos=$((pos + 1)) ;;
+        '[H') pos=0 ;;
+        '[F') pos=${#message} ;;
+        '['[0-9])
+          # longer sequence (Delete/Home/End variants), drain the trailing '~'
+          read -rsn1 extra -t 0.01 || true
+          ;;
+      esac
     else
-      message+="$char"
+      message="${message:0:pos}${char}${message:pos}"
+      pos=$((pos + 1))
     fi
 
     len=$((prefix_len + ${#message}))
@@ -140,6 +151,9 @@ read_message_colored() {
 
     printf '\r\033[K%b(%3d)\033[0m %s%b%s\033[0m' \
       "$color" "$len" "$prompt" "$color" "$message" >&2
+
+    trailing=$((${#message} - pos))
+    [ "$trailing" -gt 0 ] && printf '\033[%dD' "$trailing" >&2
   done
   printf '\n' >&2
   printf '%s' "$message"
