@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 #######################################
 # Create a file with all directory path
 # Globals:
