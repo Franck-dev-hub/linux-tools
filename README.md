@@ -22,8 +22,8 @@ Git helpers, Sylius/Symfony/PHP inspection, shell utilities, and autostart tweak
 - Tested on Ubuntu/Linux.
 
 ### Technologies used
-[![Bash](https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)](#)
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](#)
+![Bash](https://img.shields.io/badge/Bash-4eab25?logo=bash&logoColor=fff)
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)
 
 ### Installation and run
 1. Clone the repository.
