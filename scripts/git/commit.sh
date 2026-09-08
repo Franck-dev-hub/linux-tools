@@ -23,7 +23,7 @@ is_interactive_tty() {
 
 # Arrow-key menu, with fallback to classic numbered `select`
 choose_type() {
-  local options=("Feature" "Chore" "Fix" "Hotfix" "Refactor" "Doc" "Test" "Style" "Release")
+  local options=("Feature" "Chore" "Fix" "Hotfix" "Refactor" "Doc" "Test" "Style" "Release" "WIP")
 
   if ! is_interactive_tty; then
     local i reply
