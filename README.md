@@ -20,6 +20,7 @@ Git helpers, Sylius/Symfony/PHP inspection, shell utilities, and autostart tweak
 ### Prerequisites
 - `Bash`
 - `Python 3`
+- `fzf` (for `sshc.sh`)
 - Tested on Ubuntu/Linux.
 
 ### Technologies used
